@@ -1,0 +1,69 @@
+{
+    "colorScheme": "light",
+    "fonts": [
+        {
+            "family": "Inter",
+            "role": "body"
+        }
+    ],
+    "colors": {
+        "primary": "#3C0213",
+        "accent": "#25D366",
+        "background": "#FFFFFF",
+        "textPrimary": "#888888",
+        "link": "#25D366"
+    },
+    "typography": {
+        "fontFamilies": {
+            "primary": "Inter",
+            "heading": "Inter"
+        },
+        "fontStacks": {
+            "heading": [
+                "Inter",
+                "sans-serif"
+            ],
+            "body": [
+                "sans-serif"
+            ],
+            "paragraph": [
+                "Inter",
+                "sans-serif"
+            ]
+        },
+        "fontSizes": {
+            "h1": "50px",
+            "h2": "24px",
+            "body": "15px"
+        }
+    },
+    "spacing": {
+        "baseUnit": 4,
+        "borderRadius": "0px"
+    },
+    "components": {
+        "buttonPrimary": {
+            "background": "#25D366",
+            "textColor": "#0000EE",
+            "borderRadius": "8px",
+            "borderRadiusCorners": {
+                "topLeft": "8px",
+                "topRight": "8px",
+                "bottomRight": "8px",
+                "bottomLeft": "8px"
+            },
+            "shadow": "none"
+        }
+    },
+    "images": {
+        "logo": "https://framerusercontent.com/assets/DVcRuwlaalOCvsKQbez8BsCr8gg.png",
+        "favicon": "https://framerusercontent.com/images/sP2IvcBCR7efj4T94P3HEVwb1VY.png",
+        "ogImage": "https://framerusercontent.com/images/GcLZ3ZapET4DSa78K5cVz8Tn9s.png",
+        "logoAlt": "Logo"
+    },
+    "personality": {
+        "tone": "professional",
+        "energy": "medium",
+        "targetAudience": "business professionals seeking BPO services"
+    }
+}
