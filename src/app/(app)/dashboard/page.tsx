@@ -141,7 +141,7 @@ export default function DashboardPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12 }}>
                     <KPICard
                         title="Empresas Activas"
-                        value={totales.empresasActivas}
+                        value={totales.totalEmpresas}
                         trend={8.3} trendLabel="vs mes anterior"
                         accentColor="var(--color-accent)"
                         icon={<Building2 size={15} />}
@@ -179,7 +179,7 @@ export default function DashboardPage() {
                         value={totales.cxcVencida}
                         format="currency"
                         trend={-5.2}
-                        subvalue={`${Math.round((totales.cxcVencida / totales.cxcTotal) * 100)}% del total CxC`}
+                        subvalue={`${Math.round((totales.cxcVencida / totales.totalCxC) * 100)}% del total CxC`}
                         accentColor="var(--color-danger)"
                         icon={<DollarSign size={15} />}
                     />
@@ -214,7 +214,7 @@ export default function DashboardPage() {
                         </h3>
                         <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginBottom: 14 }}>Consolidado todas las empresas</p>
                         <ResponsiveContainer width="100%" height={180}>
-                            <AreaChart data={mockChartData.incomeExpenses}>
+                            <AreaChart data={mockChartData.ingresosMensuales}>
                                 <defs>
                                     <linearGradient id="gIngresos" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="5%" stopColor={CHART_GREEN} stopOpacity={0.15} />
@@ -243,13 +243,13 @@ export default function DashboardPage() {
                         </h3>
                         <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginBottom: 14 }}>Enero 2026</p>
                         <ResponsiveContainer width="100%" height={180}>
-                            <BarChart data={mockChartData.closingStatus} layout="vertical">
+                            <BarChart data={mockChartData.estadoCierre} layout="vertical">
                                 <CartesianGrid strokeDasharray="3 3" stroke="#EBEBEB" horizontal={false} />
                                 <XAxis type="number" tick={{ fill: '#AAAAAA', fontSize: 10 }} axisLine={false} tickLine={false} />
                                 <YAxis type="category" dataKey="estado" tick={{ fill: '#888', fontSize: 10 }} axisLine={false} tickLine={false} width={65} />
                                 <Tooltip {...ChartTooltipStyle} />
                                 <Bar dataKey="cantidad" radius={[0, 3, 3, 0]}>
-                                    {mockChartData.closingStatus.map((entry, index) => (
+                                    {mockChartData.estadoCierre.map((entry: any, index: number) => (
                                         <Cell key={`cell-${index}`} fill={[CHART_GREEN, CHART_AMBER, CHART_RED, CHART_PURPLE][index % 4]} />
                                     ))}
                                 </Bar>
@@ -265,8 +265,8 @@ export default function DashboardPage() {
                         <p style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginBottom: 14 }}>Distribución CRM</p>
                         <ResponsiveContainer width="100%" height={140}>
                             <PieChart>
-                                <Pie data={mockChartData.ticketsByChannel} cx="50%" cy="50%" innerRadius={42} outerRadius={62} paddingAngle={3} dataKey="value">
-                                    {mockChartData.ticketsByChannel.map((_, index) => (
+                                <Pie data={mockChartData.canalTickets} cx="50%" cy="50%" innerRadius={42} outerRadius={62} paddingAngle={3} dataKey="value">
+                                    {mockChartData.canalTickets.map((_: any, index: number) => (
                                         <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                                     ))}
                                 </Pie>
@@ -274,7 +274,7 @@ export default function DashboardPage() {
                             </PieChart>
                         </ResponsiveContainer>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 8 }}>
-                            {mockChartData.ticketsByChannel.map((item, i) => (
+                            {mockChartData.canalTickets.map((item: any, i: number) => (
                                 <div key={item.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem' }}>
                                     <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--color-text-secondary)' }}>
                                         <span style={{ width: 8, height: 8, borderRadius: 2, background: PIE_COLORS[i % PIE_COLORS.length], display: 'inline-block' }} />
