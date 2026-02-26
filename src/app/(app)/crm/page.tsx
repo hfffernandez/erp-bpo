@@ -10,11 +10,21 @@ import {
     AlertTriangle, Send, Phone, Video, Mail, Zap,
     ChevronRight, User, Building2, Link2, ArrowRight,
 } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 // ─── CRM Page ─────────────────────────────────────────────────
 
 export default function CRMPage() {
-    const [activeTicket, setActiveTicket] = useState<Ticket | null>(mockTickets[0]);
+    const searchParams = useSearchParams();
+    const empresaId = searchParams.get('empresaId');
+    const activeEmpresa = mockEmpresas.find(e => e.id === empresaId);
+
+    // Filtrar tickets si hay empresaId
+    const filteredTickets = empresaId
+        ? mockTickets.filter(t => t.razonSocialEmpresa === activeEmpresa?.razonSocial)
+        : mockTickets;
+
+    const [activeTicket, setActiveTicket] = useState<Ticket | null>(filteredTickets[0] || null);
 
     const ticketColumns = [
         {
@@ -69,8 +79,8 @@ export default function CRMPage() {
     return (
         <>
             <Topbar
-                title="CRM & Soporte Omnicanal"
-                subtitle="Módulo F · Gestión de tickets, comunicaciones y timeline unificado por cliente"
+                title={empresaId ? `Soporte: ${activeEmpresa?.razonSocial}` : "CRM & Soporte Omnicanal"}
+                subtitle={empresaId ? `Timeline de soporte para ${activeEmpresa?.rut}` : "Módulo F · Gestión de tickets y comunicaciones global"}
                 alertCount={5}
                 actions={
                     <div style={{ display: 'flex', gap: 8 }}>
@@ -89,8 +99,8 @@ export default function CRMPage() {
                 {/* ── KPIs CRM ──── */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
                     {[
-                        { label: 'Tickets Abiertos', value: '18', color: 'var(--color-info)', icon: <MessageSquare size={14} /> },
-                        { label: 'SLA Vencidos', value: '2', color: 'var(--color-danger)', icon: <AlertTriangle size={14} /> },
+                        { label: 'Tickets Abiertos', value: filteredTickets.length.toString(), color: 'var(--color-info)', icon: <MessageSquare size={14} /> },
+                        { label: 'SLA Vencidos', value: filteredTickets.filter(t => t.slaEstado === 'VENCIDO').length.toString(), color: 'var(--color-danger)', icon: <AlertTriangle size={14} /> },
                         { label: 'En Riesgo', value: '3', color: 'var(--color-warning)', icon: <Clock size={14} /> },
                         { label: 'Resueltos hoy', value: '7', color: 'var(--color-accent)', icon: <CheckCircle size={14} /> },
                         { label: 'CSAT promedio', value: '94%', color: 'var(--color-purple)', icon: <Zap size={14} /> },
@@ -157,7 +167,7 @@ export default function CRMPage() {
 
                         <DataTable
                             columns={ticketColumns}
-                            data={mockTickets}
+                            data={filteredTickets}
                             keyExtractor={(t) => t.id}
                             onRowClick={(t) => setActiveTicket(t)}
                         />

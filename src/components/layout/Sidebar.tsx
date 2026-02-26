@@ -10,6 +10,7 @@ import {
     Receipt, ShieldCheck, Users, BarChart3, MessageSquare,
     Settings, ChevronDown, ChevronRight, Bell, HelpCircle,
     LogOut, Briefcase, Package, Calculator, Zap, Search, X,
+    Clock, Calendar,
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────
@@ -88,6 +89,42 @@ export function Sidebar() {
     const empresaId = searchParams.get('empresaId');
     const activeEmpresa = mockEmpresas.find(e => e.id === empresaId);
 
+    const getHref = (path: string) => empresaId ? `${path}?empresaId=${empresaId}` : path;
+
+    // ─── Dynamic Navigation ──────────────────────────
+    const GLOBAL_ITEMS = [
+        { label: 'Mis Clientes', icon: <Building2 size={16} />, href: '/clientes', badge: 50 },
+        { label: 'Dashboard BPO', icon: <LayoutDashboard size={16} />, href: '/dashboard' },
+        { label: 'CRM & Soporte', icon: <MessageSquare size={16} />, href: '/crm' },
+    ];
+
+    const CLIENT_MANAGEMENT = [
+        {
+            label: 'GESTIÓN CONTABLE',
+            children: [
+                { label: 'Libro Mayor', icon: <BookOpen size={16} />, href: '/contabilidad' },
+                { label: 'Asientos', icon: <Calculator size={16} />, href: '/facturacion' },
+                { label: 'Plan de Cuentas', icon: <Package size={16} />, href: '/contabilidad' },
+            ]
+        },
+        {
+            label: 'PROCESOS',
+            children: [
+                { label: 'Conciliación Bancaria', icon: <Landmark size={16} />, href: '/bancos', badge: 1853 },
+                { label: 'Cierre Mensual', icon: <Calendar size={16} />, href: '/contabilidad/cierre' },
+                { label: 'Facturación DTE', icon: <FileText size={16} />, href: '/facturacion' },
+                { label: 'Activos Fijos', icon: <Briefcase size={16} />, href: '/activos' },
+                { label: 'Monitor SII', icon: <ShieldCheck size={16} />, href: '/sii' },
+            ]
+        }
+    ];
+
+    const ADMIN_ITEMS = [
+        { label: 'Equipo', icon: <Users size={16} />, href: '/equipo' },
+        { label: 'Reportes SLA', icon: <BarChart3 size={16} />, href: '/reportes' },
+        { label: 'Configuración Global', icon: <Settings size={16} />, href: '/configuracion' },
+    ];
+
     return (
         <aside className="sidebar">
             {/* ── Logo ── */}
@@ -153,78 +190,83 @@ export function Sidebar() {
                     borderRadius: 6, padding: '7px 10px',
                 }}>
                     <Search size={13} color="rgba(255,255,255,0.4)" />
-                    <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)' }}>Buscar empresa...</span>
-                    <span style={{
-                        marginLeft: 'auto', background: 'rgba(255,255,255,0.12)',
-                        padding: '1px 5px', borderRadius: 4, fontSize: '0.62rem', color: 'rgba(255,255,255,0.4)',
-                    }}>⌘K</span>
+                    <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)' }}>{activeEmpresa ? 'Buscar en cliente...' : 'Buscar cliente...'}</span>
                 </div>
             </div>
 
-            {/* ── Nav Items ── */}
+            {/* ── Navigation ── */}
             <nav style={{ flex: 1, padding: '12px 0px', overflowY: 'auto' }}>
-                {NAV_ITEMS.map((group) => (
-                    <div key={group.label} style={{ marginBottom: 24 }}>
-                        <div style={{
-                            padding: '0 20px',
-                            fontSize: '0.65rem',
-                            fontWeight: 700,
-                            color: 'rgba(255,255,255,0.4)',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.08em',
-                            marginBottom: 10
-                        }}>
-                            {group.label}
-                        </div>
-                        <div style={{ padding: '0 8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {group.children?.map((item: any) => {
-                                const active = isActive(item.href);
-                                return (
-                                    <Link
-                                        key={item.href + item.label}
-                                        href={item.href}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 12,
-                                            padding: '9px 12px',
-                                            borderRadius: 6,
-                                            background: active ? '#FFFFFF' : 'transparent',
-                                            color: active ? 'var(--color-primary)' : 'rgba(255,255,255,0.7)',
-                                            textDecoration: 'none',
-                                            fontSize: '0.82rem',
-                                            fontWeight: active ? 700 : 500,
-                                            transition: 'all 0.2s ease',
-                                        }}
-                                    >
-                                        <span style={{
-                                            color: active ? 'var(--color-primary)' : 'rgba(255,255,255,0.4)',
-                                            display: 'flex',
-                                            alignItems: 'center'
-                                        }}>
-                                            {item.icon}
-                                        </span>
-                                        <span style={{ flex: 1 }}>{item.label}</span>
-                                        {item.badge !== undefined && (
-                                            <span style={{
-                                                background: active ? 'rgba(60,2,19,0.1)' : 'rgba(255,255,255,0.12)',
-                                                color: active ? 'var(--color-primary)' : 'rgba(255,255,255,0.7)',
-                                                fontSize: '0.65rem',
-                                                fontWeight: 800,
-                                                padding: '2px 8px',
-                                                borderRadius: 10,
-                                                minWidth: 20,
-                                                textAlign: 'center'
-                                            }}>
-                                                {item.badge > 999 ? '1k+' : item.badge}
-                                            </span>
-                                        )}
-                                    </Link>
-                                );
-                            })}
-                        </div>
+
+                {/* Section Global */}
+                <div style={{ marginBottom: 24 }}>
+                    <div style={{ padding: '0 20px', fontSize: '0.65rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
+                        GESTIÓN BPO
                     </div>
-                ))}
+                    <div style={{ padding: '0 8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {GLOBAL_ITEMS.map((item) => {
+                            const active = isActive(item.href);
+                            return (
+                                <Link key={item.href} href={item.href} style={{
+                                    display: 'flex', alignItems: 'center', gap: 12, padding: '9px 12px', borderRadius: 6,
+                                    background: active ? '#FFFFFF' : 'transparent', color: active ? 'var(--color-primary)' : 'rgba(255,255,255,0.7)',
+                                    textDecoration: 'none', fontSize: '0.82rem', fontWeight: active ? 700 : 500,
+                                }}>
+                                    <span style={{ color: active ? 'var(--color-primary)' : 'rgba(255,255,255,0.4)' }}>{item.icon}</span>
+                                    <span style={{ flex: 1 }}>{item.label}</span>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Section Cliente (Contextual) */}
+                {empresaId && (
+                    <>
+                        {CLIENT_MANAGEMENT.map(section => (
+                            <div key={section.label} style={{ marginBottom: 24 }}>
+                                <div style={{ padding: '0 20px', fontSize: '0.65rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
+                                    {section.label}
+                                </div>
+                                <div style={{ padding: '0 8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                    {section.children.map((item) => {
+                                        const hrefWithId = getHref(item.href);
+                                        const active = isActive(item.href);
+                                        return (
+                                            <Link key={item.label} href={hrefWithId} style={{
+                                                display: 'flex', alignItems: 'center', gap: 12, padding: '9px 12px', borderRadius: 6,
+                                                background: active ? '#FFFFFF' : 'transparent', color: active ? 'var(--color-primary)' : 'rgba(255,255,255,0.7)',
+                                                textDecoration: 'none', fontSize: '0.82rem', fontWeight: active ? 700 : 500,
+                                            }}>
+                                                <span style={{ color: active ? 'var(--color-primary)' : 'rgba(255,255,255,0.4)' }}>{item.icon}</span>
+                                                <span style={{ flex: 1 }}>{item.label}</span>
+                                                {item.badge && <span style={{ background: active ? 'rgba(60,2,19,0.1)' : 'rgba(255,255,255,0.12)', color: active ? 'var(--color-primary)' : 'rgba(255,255,255,0.7)', fontSize: '0.65rem', fontWeight: 800, padding: '2px 8px', borderRadius: 10 }}>{item.badge > 999 ? '1k+' : item.badge}</span>}
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+                    </>
+                )}
+
+                {/* Section Admin */}
+                <div style={{ marginBottom: 24 }}>
+                    <div style={{ padding: '0 20px', fontSize: '0.65rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
+                        ADMINISTRACIÓN
+                    </div>
+                    <div style={{ padding: '0 8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {ADMIN_ITEMS.map((item) => (
+                            <Link key={item.href} href={item.href} style={{
+                                display: 'flex', alignItems: 'center', gap: 12, padding: '9px 12px', borderRadius: 6,
+                                background: isActive(item.href) ? '#FFFFFF' : 'transparent', color: isActive(item.href) ? 'var(--color-primary)' : 'rgba(255,255,255,0.7)',
+                                textDecoration: 'none', fontSize: '0.82rem', fontWeight: isActive(item.href) ? 700 : 500,
+                            }}>
+                                <span style={{ color: isActive(item.href) ? 'var(--color-primary)' : 'rgba(255,255,255,0.4)' }}>{item.icon}</span>
+                                <span style={{ flex: 1 }}>{item.label}</span>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
             </nav>
 
             {/* ── SII Sync Status ── */}
