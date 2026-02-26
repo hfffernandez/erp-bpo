@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import { mockEmpresas } from '@/lib/mockData';
 import {
     LayoutDashboard, Building2, FileText, BookOpen, Landmark,
     Receipt, ShieldCheck, Users, BarChart3, MessageSquare,
@@ -26,77 +27,51 @@ interface NavGroup {
 
 const NAV_ITEMS: NavGroup[] = [
     {
-        label: 'Dashboard BPO',
-        icon: <LayoutDashboard size={16} />,
-        href: '/dashboard',
-    },
-    {
-        label: 'Mis Empresas',
-        icon: <Building2 size={16} />,
-        href: '/empresas',
-        badge: 6,
-    },
-    {
-        label: 'Facturación DTE',
-        icon: <FileText size={16} />,
-        href: '/facturacion',
-        badge: 3,
-    },
-    {
-        label: 'Contabilidad',
-        icon: <BookOpen size={16} />,
+        label: 'GESTIÓN BPO',
+        icon: null, // Header
         children: [
-            { label: 'Asientos', href: '/facturacion' },
-            { label: 'Libro Mayor', href: '/contabilidad' },
-            { label: 'Plan de Cuentas', href: '/contabilidad' },
-            { label: 'Cierre Mensual', href: '/contabilidad' },
+            {
+                label: 'Mis Clientes',
+                icon: <Building2 size={16} />,
+                href: '/clientes',
+                badge: 50,
+            },
+            {
+                label: 'Conciliación',
+                icon: <Landmark size={16} />,
+                href: '/bancos',
+                badge: 1853,
+            },
         ],
-    },
+    } as any,
     {
-        label: 'Bancos & CxC',
-        icon: <Landmark size={16} />,
+        label: 'ADMIN',
+        icon: null, // Header
         children: [
-            { label: 'Conciliación', href: '/bancos' },
-            { label: 'Cuentas por Cobrar', href: '/cobranza' },
-            { label: 'Tesorería', href: '/bancos' },
+            {
+                label: 'Equipo',
+                icon: <Users size={16} />,
+                href: '/equipo',
+            },
+            {
+                label: 'Reportes SLA',
+                icon: <BarChart3 size={16} />,
+                href: '/reportes',
+            },
+            {
+                label: 'Configuración Global',
+                icon: <Settings size={16} />,
+                href: '/configuracion',
+            },
         ],
-    },
-    {
-        label: 'Activos Fijos',
-        icon: <Briefcase size={16} />,
-        href: '/activos',
-    },
-    {
-        label: 'Remuneraciones',
-        icon: <Users size={16} />,
-        href: '/remuneraciones',
-    },
-    {
-        label: 'Monitor SII',
-        icon: <ShieldCheck size={16} />,
-        href: '/sii',
-    },
-    {
-        label: 'Reportes',
-        icon: <BarChart3 size={16} />,
-        href: '/reportes',
-    },
-    {
-        label: 'CRM & Soporte',
-        icon: <MessageSquare size={16} />,
-        href: '/crm',
-    },
-    {
-        label: 'Configuración',
-        icon: <Settings size={16} />,
-        href: '/configuracion',
-    },
+    } as any,
 ];
 
 // ─── Sidebar ──────────────────────────────────────────────────
 
 export function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
     const [openGroups, setOpenGroups] = useState<string[]>(['Contabilidad', 'Bancos & CxC']);
 
     const toggle = (label: string) => {
@@ -108,6 +83,10 @@ export function Sidebar() {
     const isActive = (href?: string) => pathname === href;
     const isGroupActive = (children?: NavLeaf[]) =>
         children?.some(c => pathname === c.href);
+
+    const searchParams = useSearchParams();
+    const empresaId = searchParams.get('empresaId');
+    const activeEmpresa = mockEmpresas.find(e => e.id === empresaId);
 
     return (
         <aside className="sidebar">
@@ -137,23 +116,30 @@ export function Sidebar() {
 
             {/* ── Company Switcher ── */}
             <div style={{ padding: '12px 12px 8px' }}>
-                <button style={{
-                    display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-                    background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
-                    borderRadius: 6, padding: '9px 12px', cursor: 'pointer',
-                    transition: 'background var(--transition-fast)',
-                }}>
+                <button
+                    onClick={() => router.push('/clientes')}
+                    style={{
+                        display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                        background: activeEmpresa ? 'rgba(37,211,102,0.12)' : 'rgba(255,255,255,0.08)',
+                        border: `1px solid ${activeEmpresa ? 'rgba(37,211,102,0.2)' : 'rgba(255,255,255,0.12)'}`,
+                        borderRadius: 6, padding: '9px 12px', cursor: 'pointer',
+                        transition: 'background var(--transition-fast)',
+                    }}>
                     <div style={{
                         width: 28, height: 28, borderRadius: 6,
-                        background: 'var(--color-accent)',
+                        background: activeEmpresa ? 'var(--color-accent)' : 'rgba(255,255,255,0.2)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: '0.65rem', fontWeight: 800, color: '#000', flexShrink: 0,
                     }}>
-                        BB
+                        {activeEmpresa ? activeEmpresa.nombreFantasia.slice(0, 2).toUpperCase() : 'BPO'}
                     </div>
                     <div style={{ flex: 1, textAlign: 'left' }}>
-                        <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>Braddan BPO</div>
-                        <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)' }}>76.543.210-1 · Professional</div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>
+                            {activeEmpresa ? activeEmpresa.nombreFantasia : 'Seleccionar Cliente'}
+                        </div>
+                        <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.5)' }}>
+                            {activeEmpresa ? activeEmpresa.rut : 'Gestión Centralizada'}
+                        </div>
                     </div>
                     <ChevronDown size={13} color="rgba(255,255,255,0.4)" />
                 </button>
@@ -176,97 +162,69 @@ export function Sidebar() {
             </div>
 
             {/* ── Nav Items ── */}
-            <nav style={{ flex: 1, padding: '4px 8px', overflowY: 'auto' }}>
-                {NAV_ITEMS.map((item) => {
-                    const active = item.href ? isActive(item.href) : isGroupActive(item.children);
-                    const open = openGroups.includes(item.label);
-
-                    if (item.children) {
-                        return (
-                            <div key={item.label}>
-                                <button
-                                    onClick={() => toggle(item.label)}
-                                    style={{
-                                        display: 'flex', alignItems: 'center', gap: 9, width: '100%',
-                                        background: active || open ? 'rgba(37,211,102,0.12)' : 'none',
-                                        border: 'none', borderRadius: 6, padding: '9px 10px',
-                                        cursor: 'pointer',
-                                        color: active || open ? 'var(--color-accent)' : 'rgba(255,255,255,0.72)',
-                                        fontSize: '0.82rem', fontWeight: active || open ? 700 : 500,
-                                        transition: 'all var(--transition-fast)', marginBottom: 1,
-                                        textAlign: 'left',
-                                    }}
-                                >
-                                    <span style={{ color: active || open ? 'var(--color-accent)' : 'rgba(255,255,255,0.5)', flexShrink: 0 }}>
-                                        {item.icon}
-                                    </span>
-                                    <span style={{ flex: 1 }}>{item.label}</span>
-                                    {open
-                                        ? <ChevronDown size={12} style={{ opacity: 0.5 }} />
-                                        : <ChevronRight size={12} style={{ opacity: 0.5 }} />
-                                    }
-                                </button>
-                                {open && (
-                                    <div style={{ paddingLeft: 14, paddingBottom: 4 }}>
-                                        {item.children.map(child => (
-                                            <Link
-                                                key={child.href + child.label}
-                                                href={child.href}
-                                                style={{
-                                                    display: 'flex', alignItems: 'center',
-                                                    padding: '7px 10px 7px 20px',
-                                                    borderRadius: 6,
-                                                    fontSize: '0.79rem',
-                                                    color: pathname === child.href ? 'var(--color-accent)' : 'rgba(255,255,255,0.55)',
-                                                    fontWeight: pathname === child.href ? 600 : 400,
-                                                    background: pathname === child.href ? 'rgba(37,211,102,0.10)' : 'none',
-                                                    textDecoration: 'none',
-                                                    transition: 'all var(--transition-fast)',
-                                                    borderLeft: `2px solid ${pathname === child.href ? 'var(--color-accent)' : 'rgba(255,255,255,0.10)'}`,
-                                                    marginBottom: 1,
-                                                }}
-                                            >
-                                                {child.label}
-                                            </Link>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    }
-
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href!}
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: 9,
-                                background: active ? 'rgba(37,211,102,0.14)' : 'none',
-                                borderRadius: 6, padding: '9px 10px',
-                                color: active ? 'var(--color-accent)' : 'rgba(255,255,255,0.72)',
-                                fontSize: '0.82rem', fontWeight: active ? 700 : 500,
-                                textDecoration: 'none',
-                                transition: 'all var(--transition-fast)', marginBottom: 1,
-                                borderLeft: `2px solid ${active ? 'var(--color-accent)' : 'transparent'}`,
-                            }}
-                        >
-                            <span style={{ color: active ? 'var(--color-accent)' : 'rgba(255,255,255,0.5)', flexShrink: 0 }}>
-                                {item.icon}
-                            </span>
-                            <span style={{ flex: 1 }}>{item.label}</span>
-                            {item.badge !== undefined && (
-                                <span style={{
-                                    background: active ? 'var(--color-accent)' : 'rgba(255,255,255,0.15)',
-                                    color: active ? '#000' : 'rgba(255,255,255,0.7)',
-                                    fontSize: '0.65rem', fontWeight: 700, padding: '1px 6px',
-                                    borderRadius: 9999, minWidth: 18, textAlign: 'center',
-                                }}>
-                                    {item.badge}
-                                </span>
-                            )}
-                        </Link>
-                    );
-                })}
+            <nav style={{ flex: 1, padding: '12px 0px', overflowY: 'auto' }}>
+                {NAV_ITEMS.map((group) => (
+                    <div key={group.label} style={{ marginBottom: 24 }}>
+                        <div style={{
+                            padding: '0 20px',
+                            fontSize: '0.65rem',
+                            fontWeight: 700,
+                            color: 'rgba(255,255,255,0.4)',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.08em',
+                            marginBottom: 10
+                        }}>
+                            {group.label}
+                        </div>
+                        <div style={{ padding: '0 8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {group.children?.map((item: any) => {
+                                const active = isActive(item.href);
+                                return (
+                                    <Link
+                                        key={item.href + item.label}
+                                        href={item.href}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 12,
+                                            padding: '9px 12px',
+                                            borderRadius: 6,
+                                            background: active ? '#FFFFFF' : 'transparent',
+                                            color: active ? 'var(--color-primary)' : 'rgba(255,255,255,0.7)',
+                                            textDecoration: 'none',
+                                            fontSize: '0.82rem',
+                                            fontWeight: active ? 700 : 500,
+                                            transition: 'all 0.2s ease',
+                                        }}
+                                    >
+                                        <span style={{
+                                            color: active ? 'var(--color-primary)' : 'rgba(255,255,255,0.4)',
+                                            display: 'flex',
+                                            alignItems: 'center'
+                                        }}>
+                                            {item.icon}
+                                        </span>
+                                        <span style={{ flex: 1 }}>{item.label}</span>
+                                        {item.badge !== undefined && (
+                                            <span style={{
+                                                background: active ? 'rgba(60,2,19,0.1)' : 'rgba(255,255,255,0.12)',
+                                                color: active ? 'var(--color-primary)' : 'rgba(255,255,255,0.7)',
+                                                fontSize: '0.65rem',
+                                                fontWeight: 800,
+                                                padding: '2px 8px',
+                                                borderRadius: 10,
+                                                minWidth: 20,
+                                                textAlign: 'center'
+                                            }}>
+                                                {item.badge > 999 ? '1k+' : item.badge}
+                                            </span>
+                                        )}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ))}
             </nav>
 
             {/* ── SII Sync Status ── */}

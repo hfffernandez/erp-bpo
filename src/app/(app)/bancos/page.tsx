@@ -3,19 +3,24 @@
 import { useState } from 'react';
 import { Topbar } from '@/components/layout/Sidebar';
 import { DataTable, StatusBadge, ProgressRing } from '@/components/ui';
-import { mockMovBancarios, mockCxC, formatCLP } from '@/lib/mockData';
+import { mockMovBancarios, mockCxC, formatCLP, mockEmpresas } from '@/lib/mockData';
 import type { MovimientoBancario, DocumentoCobro } from '@/types';
 import {
     Landmark, RefreshCw, CheckCircle, AlertTriangle, Clock,
     Link2, Download, Search, Filter, ArrowUpRight, ArrowDownRight,
-    Activity, BarChart3,
+    Activity, BarChart3, Building2
 } from 'lucide-react';
-
-// ─── Conciliación Bancaria Page ───────────────────────────────
+import { useSearchParams, useRouter } from 'next/navigation';
 
 export default function BancosPage() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const empresaId = searchParams.get('empresaId');
     const [matchedIds, setMatchedIds] = useState<string[]>(['mov-001', 'mov-002']);
 
+    const activeEmpresa = mockEmpresas.find(e => e.id === empresaId);
+
+    // Columns Definition
     const movColumns = [
         {
             key: 'fecha', header: 'Fecha', width: '90px',
@@ -155,11 +160,43 @@ export default function BancosPage() {
     const totalMovimientos = mockMovBancarios.length;
     const pctConciliado = Math.round((conciliadosCount / totalMovimientos) * 100);
 
+    if (!empresaId) {
+        return (
+            <>
+                <Topbar title="Conciliación Bancaria" subtitle="Selección de empresa requerida" />
+                <div style={{
+                    height: '70vh', display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center', gap: 24
+                }}>
+                    <div style={{
+                        width: 100, height: 100, borderRadius: '50%', background: 'rgba(60,2,19,0.05)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)'
+                    }}>
+                        <Building2 size={48} />
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                        <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-text-heading)' }}>Selecciona una Empresa</h2>
+                        <p style={{ fontSize: '0.94rem', color: 'var(--color-text-muted)', maxWidth: 360, margin: '12px auto 32px', lineHeight: 1.6 }}>
+                            Para realizar la conciliación bancaria y ver los mayores, primero debes seleccionar un cliente de tu portafolio.
+                        </p>
+                        <button
+                            onClick={() => router.push('/clientes')}
+                            className="btn btn-primary"
+                            style={{ padding: '12px 32px', fontSize: '1rem', borderRadius: 10 }}
+                        >
+                            Ver Portafolio de Clientes
+                        </button>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
     return (
         <>
             <Topbar
-                title="Bancos & Conciliación"
-                subtitle="Módulo E.3 · Conciliación bancaria automática · 8 bancos conectados"
+                title={`Conciliación: ${activeEmpresa?.razonSocial || 'Cargando...'}`}
+                subtitle={`Módulo E.3 · ${activeEmpresa?.rut} · Bancos Conectados`}
                 alertCount={1}
                 actions={
                     <div style={{ display: 'flex', gap: 8 }}>
@@ -281,7 +318,7 @@ export default function BancosPage() {
                 <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                         <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                            Movimientos Bancarios — BCI Cta. 10-000-12345-6
+                            Movimientos Bancarios — {activeEmpresa?.razonSocial}
                         </h2>
                         <div style={{ display: 'flex', gap: 8 }}>
                             <button className="btn btn-secondary btn-sm"><Filter size={12} /></button>
@@ -299,7 +336,7 @@ export default function BancosPage() {
                 <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                         <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                            📊 Aging Report — Cuentas por Cobrar (Todas las empresas)
+                            📊 Aging Report — Cuentas por Cobrar
                         </h2>
                         <div style={{ display: 'flex', gap: 8 }}>
                             <button className="btn btn-primary btn-sm">

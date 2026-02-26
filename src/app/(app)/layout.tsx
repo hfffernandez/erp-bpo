@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
     title: 'Dashboard | BPO-Core Chile',
@@ -8,7 +9,9 @@ export const metadata: Metadata = {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     return (
         <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-bg)' }}>
-            <Sidebar />
+            <Suspense fallback={<div style={{ width: 260, background: 'var(--color-primary)' }} />}>
+                <Sidebar />
+            </Suspense>
             <main style={{
                 marginLeft: 260,
                 flex: 1,
@@ -18,7 +21,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 overflow: 'auto',
                 background: 'var(--color-bg-elevated)',  /* light gray #F0F0F0 */
             }}>
-                {children}
+                <Suspense fallback={<div>Cargando...</div>}>
+                    {children}
+                </Suspense>
             </main>
         </div>
     );

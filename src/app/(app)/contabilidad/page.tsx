@@ -1,8 +1,10 @@
 'use client';
+
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Topbar } from '@/components/layout/Sidebar';
 import { KPICard } from '@/components/ui';
-import { formatCLP } from '@/lib/mockData';
-import { BookOpen, Plus, RefreshCw, Filter } from 'lucide-react';
+import { formatCLP, mockEmpresas } from '@/lib/mockData';
+import { BookOpen, Plus, RefreshCw, Filter, Building2 } from 'lucide-react';
 
 const PLAN_CUENTAS = [
     { codigo: '1', descripcion: 'ACTIVOS', tipo: 'ACTIVO', nivel: 1, saldo: 96670000 },
@@ -40,11 +42,49 @@ const TIPO_COLORS: Record<string, string> = {
 };
 
 export default function ContabilidadPage() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const empresaId = searchParams.get('empresaId');
+
+    const activeEmpresa = mockEmpresas.find(e => e.id === empresaId);
+
+    if (!empresaId) {
+        return (
+            <>
+                <Topbar title="Libro Mayor y Balances" subtitle="Selección de empresa requerida" />
+                <div style={{
+                    height: '70vh', display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center', gap: 24
+                }}>
+                    <div style={{
+                        width: 100, height: 100, borderRadius: '50%', background: 'rgba(60,2,19,0.05)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)'
+                    }}>
+                        <Building2 size={48} />
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                        <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-text-heading)' }}>Selecciona una Empresa</h2>
+                        <p style={{ fontSize: '0.94rem', color: 'var(--color-text-muted)', maxWidth: 360, margin: '12px auto 32px', lineHeight: 1.6 }}>
+                            Para ver el Libro Mayor y el Balance, primero debes seleccionar un cliente de tu portafolio.
+                        </p>
+                        <button
+                            onClick={() => router.push('/clientes')}
+                            className="btn btn-primary"
+                            style={{ padding: '12px 32px', fontSize: '1rem', borderRadius: 10 }}
+                        >
+                            Ir al Portafolio
+                        </button>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
     return (
         <>
             <Topbar
-                title="Contabilidad · Plan de Cuentas"
-                subtitle="Módulo B · Motor contable · Empresa: Inversiones Meridian SpA"
+                title={`Contabilidad: ${activeEmpresa?.razonSocial}`}
+                subtitle={`Módulo B · Motor contable IFRS · ${activeEmpresa?.rut}`}
                 actions={
                     <div style={{ display: 'flex', gap: 8 }}>
                         <button className="btn btn-secondary btn-sm"><Filter size={13} /> Filtros</button>
